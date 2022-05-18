@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_codigo5_sqflite/models/book_model.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -39,10 +40,15 @@ class DBAdmin {
     return res;
   }
 
-  Future<List> getBooks() async{
+  Future<List<BookModel>> getBooks() async{
     //Database? databaseDB = await getCheckDatabase();
     final Database? databaseDB = await getCheckDatabase();
-    List res = await databaseDB!.query("BOOK");
+    List<BookModel> res = [];
+    List<Map<String,dynamic>> getRes = await databaseDB!.query("BOOK");
+    getRes.forEach((element) {
+      BookModel myBook = BookModel.fromMapToModel(element);
+      res.add(myBook);
+    });
     return res;
   }
 

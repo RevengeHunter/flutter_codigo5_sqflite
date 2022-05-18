@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_codigo5_sqflite/models/book_model.dart';
 import 'package:flutter_codigo5_sqflite/ui/widgets/item_book_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../db/db_admin.dart';
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List books = [];
+  List<BookModel> books = [];
 
   @override
   void initState() {
@@ -165,9 +166,9 @@ class _HomePageState extends State<HomePage> {
                     children: books
                         .map(
                           (e) => ItemSliderWidget(
-                            authorBook: e["author"],
-                            imageBook: e["image"],
-                            titleBook: e["title"],
+                            authorBook: e.authorBook,
+                            imageBook: e.imageBook,
+                            titleBook: e.titleBook,
                           ),
                         )
                         .toList(),
@@ -180,10 +181,10 @@ class _HomePageState extends State<HomePage> {
                   children: books
                       .map(
                         (e) => ItemBookWidget(
-                          authorBook: e["author"],
-                          imageBook: e["image"],
-                          titleBook: e["title"],
-                          descriptionBook: e["description"],
+                          authorBook: e.authorBook,
+                          imageBook: e.imageBook,
+                          titleBook: e.titleBook,
+                          descriptionBook: e.descriptionBook,
                         ),
                       )
                       .toList(),
