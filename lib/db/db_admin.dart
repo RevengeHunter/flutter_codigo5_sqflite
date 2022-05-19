@@ -42,13 +42,14 @@ class DBAdmin {
 
   Future<List<BookModel>> getBooks() async{
     //Database? databaseDB = await getCheckDatabase();
-    final Database? databaseDB = await getCheckDatabase();
     List<BookModel> res = [];
-    List<Map<String,dynamic>> getRes = await databaseDB!.query("BOOK");
-    getRes.forEach((element) {
-      BookModel myBook = BookModel.fromMapToModel(element);
-      res.add(myBook);
-    });
+    final Database? databaseDB = await getCheckDatabase();
+    List getRes = await databaseDB!.query("BOOK");
+    // getRes.forEach((element) {
+    //   res.add(BookModel.fromMapToModel(element));
+    // });
+    res = getRes.map<BookModel>((e) => BookModel.fromMapToModel(e)).toList();
+
     return res;
   }
 
@@ -60,16 +61,21 @@ class DBAdmin {
     print(res);
   }
 
-  insertBook() async{
+  insertBook(BookModel book) async{
     //Database? databaseDB = await getCheckDatabase();
     final Database? databaseDB = await getCheckDatabase();
-    int res = await databaseDB!.insert("BOOK",{
-      "title":"Codigo Limpio",
-      "author":"Robert C. Martin",
-      "description":"up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum",
-      "image":"https://images.cdn3.buscalibre.com/fit-in/360x360/10/fb/10fb170d7732b7dca25ebb81ded2572d.jpg"
-    });
+    bool inserted;
+    int res = await databaseDB!.insert("BOOK",book.toJson()
+    //     {
+    //   "title":"Codigo Limpio",
+    //   "author":"Robert C. Martin",
+    //   "description":"up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum",
+    //   "image":"https://images.cdn3.buscalibre.com/fit-in/360x360/10/fb/10fb170d7732b7dca25ebb81ded2572d.jpg"
+    // }
+    );
     print(res);
+    (res!=null) ? inserted=true: inserted=false;
+    return inserted;
   }
 
   //UPDATE - Realizar actualizaciones a la tabla
