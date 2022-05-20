@@ -1,14 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_codigo5_sqflite/models/book_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ItemSliderWidget extends StatelessWidget {
+  // String titleBook;
+  // String authorBook;
+  // String imageBook;
 
-  String titleBook;
-  String authorBook;
-  String imageBook;
+  BookModel book;
 
-  ItemSliderWidget({required this.titleBook, required this.authorBook, required this.imageBook});
+  ItemSliderWidget({
+    required this.book,
+    // required this.titleBook,
+    // required this.authorBook,
+    // required this.imageBook,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +29,7 @@ class ItemSliderWidget extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(14.0),
             child: Image.network(
-              imageBook,
+              book.imageBook,
               height: 250,
               width: 170,
               fit: BoxFit.cover,
@@ -39,7 +46,7 @@ class ItemSliderWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  authorBook,
+                  book.authorBook,
                   style: GoogleFonts.poppins(
                     fontSize: 12.0,
                     color: Colors.white70,
@@ -49,7 +56,7 @@ class ItemSliderWidget extends StatelessWidget {
                   height: 2.0,
                 ),
                 Text(
-                  titleBook,
+                  book.titleBook,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(

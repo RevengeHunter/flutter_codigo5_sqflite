@@ -1,16 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_codigo5_sqflite/models/book_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ItemBookWidget extends StatelessWidget {
+  // String titleBook;
+  // String authorBook;
+  // String imageBook;
+  // String descriptionBook;
+  BookModel book;
 
-  String titleBook;
-  String authorBook;
-  String imageBook;
-  String descriptionBook;
-
-  ItemBookWidget({required this.titleBook, required this.authorBook, required this.descriptionBook, required this.imageBook});
-
+  ItemBookWidget({
+    required this.book,
+    // required this.titleBook,
+    // required this.authorBook,
+    // required this.descriptionBook,
+    // required this.imageBook,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +29,7 @@ class ItemBookWidget extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: Image.network(
-              imageBook,
+              book.imageBook,
               width: 80.0,
               height: 100.0,
               fit: BoxFit.cover,
@@ -37,7 +43,7 @@ class ItemBookWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  authorBook,
+                  book.authorBook,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
@@ -46,7 +52,7 @@ class ItemBookWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  titleBook,
+                  book.titleBook,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
@@ -56,7 +62,7 @@ class ItemBookWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  descriptionBook,
+                  book.descriptionBook,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(

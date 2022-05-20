@@ -36,7 +36,7 @@ class DBAdmin {
   Future<List> getBooksRaw() async{
     //Database? databaseDB = await getCheckDatabase();
     final Database? databaseDB = await getCheckDatabase();
-    List res = await databaseDB!.rawQuery("SELECT * FROM BOOK");
+    List res = await databaseDB!.rawQuery("SELECT * FROM BOOK ORDER BY id DESC");
     return res;
   }
 
@@ -44,7 +44,8 @@ class DBAdmin {
     //Database? databaseDB = await getCheckDatabase();
     List<BookModel> res = [];
     final Database? databaseDB = await getCheckDatabase();
-    List getRes = await databaseDB!.query("BOOK");
+    List getRes = await databaseDB!.query("BOOK",orderBy: "id DESC");
+    // getRes = getRes.reversed.toList();
     // getRes.forEach((element) {
     //   res.add(BookModel.fromMapToModel(element));
     // });
@@ -64,26 +65,35 @@ class DBAdmin {
   insertBook(BookModel book) async{
     //Database? databaseDB = await getCheckDatabase();
     final Database? databaseDB = await getCheckDatabase();
-    bool inserted;
+    //bool inserted;
     int res = await databaseDB!.insert("BOOK",book.toJson()
     //     {
-    //   "title":"Codigo Limpio",
-    //   "author":"Robert C. Martin",
-    //   "description":"up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum",
-    //   "image":"https://images.cdn3.buscalibre.com/fit-in/360x360/10/fb/10fb170d7732b7dca25ebb81ded2572d.jpg"
+    //   "title":book.titleBook,
+    //   "author":book.authorBook,
+    //   "description":book.descriptionBook,
+    //   "image":book.imageBook,
     // }
     );
     print(res);
-    (res!=null) ? inserted=true: inserted=false;
-    return inserted;
+    //(res!=null) ? inserted=true: inserted=false;
+    return res;
   }
 
   //UPDATE - Realizar actualizaciones a la tabla
-  updateBook() async{
+  Future<int> updateBookRaw(BookModel book) async{
     //Database? databaseDB = await getCheckDatabase();
     final Database? databaseDB = await getCheckDatabase();
-    List res = await databaseDB!.rawQuery("UPDATE BOOK SET WHERE");
+    int res = await databaseDB!.rawUpdate("UPDATE BOOK SET title = ${book.titleBook}, author = ${book.authorBook}, description = ${book.descriptionBook}, image = ${book.imageBook}  WHERE id = ${book.id}");
     print(res);
+    return res;
+  }
+
+  updateBook(BookModel book) async{
+    //Database? databaseDB = await getCheckDatabase();
+    final Database? databaseDB = await getCheckDatabase();
+    int res = await databaseDB!.update("BOOK",book.toJson(), where: "id = ${book.id}");
+    print(res);
+    return res;
   }
 
   //DELETE - Realizar eliminaciones a la tabla

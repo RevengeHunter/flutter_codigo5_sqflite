@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_codigo5_sqflite/models/book_model.dart';
 import 'package:flutter_codigo5_sqflite/ui/widgets/item_book_widget.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../db/db_admin.dart';
 import '../ui/utils/colors.dart';
@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _txtCoverController = TextEditingController();
 
   List<BookModel> books = [];
-  bool registered = true;
+  int bookID = 0;
 
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  _showForm() {
+  _showForm(String titleForm) {
     showDialog(
       context: context,
       barrierDismissible:
@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Agregar Libro",
+                  "$titleForm Book",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                   ),
@@ -120,28 +120,64 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () {
                         BookModel regBook = BookModel(
-                          id: books.length,
+                          id: (bookID==0) ? null : bookID,
                           titleBook: _txtTitleController.text,
                           authorBook: _txtAuthorController.text,
                           descriptionBook: _txtDescriptionController.text,
                           imageBook: _txtCoverController.text,
                         );
 
-                        DBAdmin.db.insertBook(regBook).then((value) {
-                          if(value >= 0){
-                            _txtTitleController.clear();
-                            _txtAuthorController.clear();
-                            _txtDescriptionController.clear();
-                            _txtCoverController.clear();
+                        if(bookID == 0){
+                          DBAdmin.db.insertBook(regBook).then((value) {
+                            if (value >= 0) {
+                              _txtTitleController.clear();
+                              _txtAuthorController.clear();
+                              _txtDescriptionController.clear();
+                              _txtCoverController.clear();
+                              bookID = 0;
+                              getData();
+                              Navigator.pop(context);
+                            }
+                          });
+                        }else{
+                          DBAdmin.db.updateBook(regBook).then((value){
+                            if (value >= 0) {
+                              _txtTitleController.clear();
+                              _txtAuthorController.clear();
+                              _txtDescriptionController.clear();
+                              _txtCoverController.clear();
+                              bookID = 0;
+                              getData();
+                              Navigator.pop(context);
+                            }
+                          });
+                        }
 
-                            Navigator.pop(context);
-
-                            getData();
-                          }
-                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: const Color(0xff00afb9),
+                            duration: const Duration(seconds: 3),
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "The book was $titleForm successfuly",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
                       },
                       child: Text(
-                        "Aceptar",
+                        titleForm,
                       ),
                     ),
                   ],
@@ -161,7 +197,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: kSecondaryColor,
         onPressed: () {
-          _showForm();
+          _showForm("Register");
         },
         child: Icon(
           Icons.add,
@@ -169,6 +205,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
@@ -297,10 +334,21 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     children: books
                         .map<Widget>(
-                          (e) => ItemSliderWidget(
-                            authorBook: e.authorBook,
-                            imageBook: e.imageBook,
-                            titleBook: e.titleBook,
+                          (e) => GestureDetector(
+                            onLongPress: (){
+                              _showForm("Update");
+                              bookID = e.id!;
+                              _txtTitleController.text = e.titleBook;
+                              _txtAuthorController.text = e.authorBook;
+                              _txtDescriptionController.text = e.descriptionBook;
+                              _txtCoverController.text = e.imageBook;
+                            },
+                            child: ItemSliderWidget(
+                              book: e,
+                              // authorBook: e.authorBook,
+                              // imageBook: e.imageBook,
+                              // titleBook: e.titleBook,
+                            ),
                           ),
                         )
                         .toList(),
@@ -313,10 +361,11 @@ class _HomePageState extends State<HomePage> {
                   children: books
                       .map<Widget>(
                         (e) => ItemBookWidget(
-                          authorBook: e.authorBook,
-                          imageBook: e.imageBook,
-                          titleBook: e.titleBook,
-                          descriptionBook: e.descriptionBook,
+                          book: e,
+                          // authorBook: e.authorBook,
+                          // imageBook: e.imageBook,
+                          // titleBook: e.titleBook,
+                          // descriptionBook: e.descriptionBook,
                         ),
                       )
                       .toList(),
