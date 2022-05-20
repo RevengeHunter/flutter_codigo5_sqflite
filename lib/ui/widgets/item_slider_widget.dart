@@ -47,6 +47,8 @@ class ItemSliderWidget extends StatelessWidget {
               children: [
                 Text(
                   book.authorBook,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 12.0,
                     color: Colors.white70,

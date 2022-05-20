@@ -40,6 +40,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  _cleanForm() {
+    _txtTitleController.clear();
+    _txtAuthorController.clear();
+    _txtDescriptionController.clear();
+    _txtCoverController.clear();
+    bookID = 0;
+  }
+
   _showForm(String titleForm) {
     showDialog(
       context: context,
@@ -120,33 +128,25 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () {
                         BookModel regBook = BookModel(
-                          id: (bookID==0) ? null : bookID,
+                          id: (bookID == 0) ? null : bookID,
                           titleBook: _txtTitleController.text,
                           authorBook: _txtAuthorController.text,
                           descriptionBook: _txtDescriptionController.text,
                           imageBook: _txtCoverController.text,
                         );
 
-                        if(bookID == 0){
+                        if (bookID == 0) {
                           DBAdmin.db.insertBook(regBook).then((value) {
                             if (value >= 0) {
-                              _txtTitleController.clear();
-                              _txtAuthorController.clear();
-                              _txtDescriptionController.clear();
-                              _txtCoverController.clear();
-                              bookID = 0;
+                              _cleanForm();
                               getData();
                               Navigator.pop(context);
                             }
                           });
-                        }else{
-                          DBAdmin.db.updateBook(regBook).then((value){
+                        } else {
+                          DBAdmin.db.updateBook(regBook).then((value) {
                             if (value >= 0) {
-                              _txtTitleController.clear();
-                              _txtAuthorController.clear();
-                              _txtDescriptionController.clear();
-                              _txtCoverController.clear();
-                              bookID = 0;
+                              _cleanForm();
                               getData();
                               Navigator.pop(context);
                             }
@@ -190,6 +190,128 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  _showDeleteConfirmation(int idBook, String titleBook) {
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, //Ya no desaparece el show dialog si se hace touch fuera
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0,),
+          backgroundColor: kPrimaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          content: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Delete Book",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+                Container(
+                  width: 100.0,
+                  height: 3.0,
+                  decoration: BoxDecoration(
+                    color: kSecondaryColor,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                const SizedBox(
+                  height: 16.0,
+                ),
+                Text(
+                  "Are you sure you want to delete the book",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white60,
+                    fontSize: 12.0,
+                  ),
+                ),
+                Text(
+                  titleBook,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 14.0,
+                  ),
+                ),
+                const SizedBox(
+                  height: 16.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Cancelar",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white60,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10.0,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: kSecondaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        DBAdmin.db.deleteBook(idBook).then((value) {
+                          if (value >= 0) {
+                            _cleanForm();
+                            getData();
+                            Navigator.pop(context);
+                          }
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: const Color(0xff00afb9),
+                            duration: const Duration(seconds: 3),
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "The book was delete successfuly",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Delete",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -197,6 +319,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: kSecondaryColor,
         onPressed: () {
+          _cleanForm();
           _showForm("Register");
         },
         child: Icon(
@@ -335,12 +458,13 @@ class _HomePageState extends State<HomePage> {
                     children: books
                         .map<Widget>(
                           (e) => GestureDetector(
-                            onLongPress: (){
+                            onLongPress: () {
                               _showForm("Update");
                               bookID = e.id!;
                               _txtTitleController.text = e.titleBook;
                               _txtAuthorController.text = e.authorBook;
-                              _txtDescriptionController.text = e.descriptionBook;
+                              _txtDescriptionController.text =
+                                  e.descriptionBook;
                               _txtCoverController.text = e.imageBook;
                             },
                             child: ItemSliderWidget(
@@ -362,6 +486,11 @@ class _HomePageState extends State<HomePage> {
                       .map<Widget>(
                         (e) => ItemBookWidget(
                           book: e,
+                          onTap: () {
+                            print("hola");
+                            print(e.id.toString());
+                            _showDeleteConfirmation(e.id!,e.titleBook);
+                          },
                           // authorBook: e.authorBook,
                           // imageBook: e.imageBook,
                           // titleBook: e.titleBook,

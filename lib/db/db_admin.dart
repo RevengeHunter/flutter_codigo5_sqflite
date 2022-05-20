@@ -97,11 +97,20 @@ class DBAdmin {
   }
 
   //DELETE - Realizar eliminaciones a la tabla
-  deleteBook() async{
+  Future<int> deleteBookRaw(int idBook) async{
     //Database? databaseDB = await getCheckDatabase();
     final Database? databaseDB = await getCheckDatabase();
-    List res = await databaseDB!.rawQuery("DELETE FROM BOOK WHERE ");
+    int res = await databaseDB!.rawDelete("DELETE FROM BOOK WHERE id = $idBook");
     print(res);
+    return res;
+  }
+
+  deleteBook(int idBook) async{
+    //Database? databaseDB = await getCheckDatabase();
+    final Database? databaseDB = await getCheckDatabase();
+    int res = await databaseDB!.delete("BOOK", where: "id = $idBook");
+    print(res);
+    return res;
   }
 
 }
