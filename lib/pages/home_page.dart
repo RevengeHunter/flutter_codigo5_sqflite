@@ -7,6 +7,7 @@ import '../db/db_admin.dart';
 import '../ui/utils/colors.dart';
 import '../ui/widgets/input_textfield_widget.dart';
 import '../ui/widgets/item_slider_widget.dart';
+import 'detail_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _txtAuthorController = TextEditingController();
   TextEditingController _txtDescriptionController = TextEditingController();
   TextEditingController _txtCoverController = TextEditingController();
+
+  TextEditingController _txtSearchController = TextEditingController();
 
   List<BookModel> books = [];
   int bookID = 0;
@@ -36,6 +39,13 @@ class _HomePageState extends State<HomePage> {
     DBAdmin.db.getBooks().then((value) {
       books = value;
       print(books.length.toString());
+      setState(() {});
+    });
+  }
+
+  searchBook(String bookSearch){
+    DBAdmin.db.getBooksSearch(bookSearch).then((value){
+      books = value;
       setState(() {});
     });
   }
@@ -269,7 +279,6 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         DBAdmin.db.deleteBook(idBook).then((value) {
                           if (value >= 0) {
-                            _cleanForm();
                             getData();
                             Navigator.pop(context);
                           }
@@ -389,6 +398,7 @@ class _HomePageState extends State<HomePage> {
                   height: 30.0,
                 ),
                 TextField(
+                  controller: _txtSearchController,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -418,9 +428,18 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.search,
-                        color: Colors.white,
+                      child: IconButton(
+                        onPressed: (){
+                          if(_txtSearchController.text.trim().isNotEmpty){
+                            searchBook(_txtSearchController.text.toUpperCase());
+                          }else{
+                            getData();
+                          }
+                        },
+                        icon: Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -467,6 +486,9 @@ class _HomePageState extends State<HomePage> {
                                   e.descriptionBook;
                               _txtCoverController.text = e.imageBook;
                             },
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> DetailPage(book: e,)));
+                            },
                             child: ItemSliderWidget(
                               book: e,
                               // authorBook: e.authorBook,
@@ -484,17 +506,22 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: books
                       .map<Widget>(
-                        (e) => ItemBookWidget(
-                          book: e,
-                          onTap: () {
-                            print("hola");
-                            print(e.id.toString());
-                            _showDeleteConfirmation(e.id!,e.titleBook);
+                        (e) => GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> DetailPage(book: e,)));
                           },
-                          // authorBook: e.authorBook,
-                          // imageBook: e.imageBook,
-                          // titleBook: e.titleBook,
-                          // descriptionBook: e.descriptionBook,
+                          child: ItemBookWidget(
+                            book: e,
+                            onTap: () {
+                              print("hola");
+                              print(e.id.toString());
+                              _showDeleteConfirmation(e.id!,e.titleBook);
+                            },
+                            // authorBook: e.authorBook,
+                            // imageBook: e.imageBook,
+                            // titleBook: e.titleBook,
+                            // descriptionBook: e.descriptionBook,
+                          ),
                         ),
                       )
                       .toList(),

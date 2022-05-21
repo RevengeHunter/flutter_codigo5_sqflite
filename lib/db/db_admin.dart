@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_codigo5_sqflite/models/book_model.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -49,6 +48,16 @@ class DBAdmin {
     // getRes.forEach((element) {
     //   res.add(BookModel.fromMapToModel(element));
     // });
+    res = getRes.map<BookModel>((e) => BookModel.fromMapToModel(e)).toList();
+
+    return res;
+  }
+
+  Future<List<BookModel>> getBooksSearch(String textSearch) async{
+    //Database? databaseDB = await getCheckDatabase();
+    List<BookModel> res = [];
+    final Database? databaseDB = await getCheckDatabase();
+    List getRes = await databaseDB!.query("BOOK",where: "UPPER(title) LIKE '%$textSearch%' OR UPPER(author) LIKE '%$textSearch%'" ,orderBy: "id DESC");
     res = getRes.map<BookModel>((e) => BookModel.fromMapToModel(e)).toList();
 
     return res;
